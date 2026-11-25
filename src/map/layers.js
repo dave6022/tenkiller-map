@@ -152,45 +152,6 @@ export const LAYERS = [
   },
 ];
 
-// Parcel boundaries, served as WMS images straight from the state GeoServer.
-// Tiles are images, so they are not subject to CORS — only the click lookup in
-// lib/parcel.js needs the proxy.
-const PARCEL_TILES = 'https://okmaps.org/geoserver/wms'
-  + '?service=WMS&version=1.1.1&request=GetMap'
-  + '&layers=ogi_wms%3AStatewide_Parcels'
-  + '&srs=EPSG:3857&bbox={bbox-epsg-3857}'
-  + '&width=256&height=256&format=image/png&transparent=true';
-
-LAYERS.push({
-  id: 'parcels',
-  name: 'Parcels & owners',
-  group: 'Property',
-  note: 'County assessor boundaries statewide. Tap a parcel for owner of record, acreage and a link to the county record.',
-  defaultOn: true,
-  attach(map) {
-    if (!map.getSource('parcels')) {
-      map.addSource('parcels', {
-        type: 'raster',
-        tiles: [PARCEL_TILES],
-        tileSize: 256,
-        attribution: 'Parcels: Oklahoma OGI / county assessors',
-      });
-    }
-    if (!map.getLayer('parcels')) {
-      map.addLayer({
-        id: 'parcels',
-        type: 'raster',
-        source: 'parcels',
-        paint: { 'raster-opacity': 0.85 },
-      }, firstLabelLayer(map));
-    }
-  },
-  detach(map) {
-    if (map.getLayer('parcels')) map.removeLayer('parcels');
-    if (map.getSource('parcels')) map.removeSource('parcels');
-  },
-});
-
 // Water depth is deliberately absent, and this records why so the next person
 // does not repeat the search.
 //
@@ -758,45 +719,6 @@ LAYERS.push({
     if (map.getSource('trails')) map.removeSource('trails');
   },
 });
-
-const SELECTED_SOURCE = 'parcel-selected';
-
-/** Outline the parcel the user tapped, using the geometry the lookup returned. */
-export function showSelectedParcel(map, geometry) {
-  if (!map || !map.isStyleLoaded()) return;
-
-  if (!geometry) {
-    if (map.getLayer('parcel-selected-line')) map.removeLayer('parcel-selected-line');
-    if (map.getLayer('parcel-selected-fill')) map.removeLayer('parcel-selected-fill');
-    if (map.getSource(SELECTED_SOURCE)) map.removeSource(SELECTED_SOURCE);
-    return;
-  }
-
-  const data = { type: 'Feature', geometry, properties: {} };
-
-  if (map.getSource(SELECTED_SOURCE)) {
-    map.getSource(SELECTED_SOURCE).setData(data);
-  } else {
-    map.addSource(SELECTED_SOURCE, { type: 'geojson', data });
-  }
-
-  if (!map.getLayer('parcel-selected-fill')) {
-    map.addLayer({
-      id: 'parcel-selected-fill',
-      type: 'fill',
-      source: SELECTED_SOURCE,
-      paint: { 'fill-color': '#3F6212', 'fill-opacity': 0.22 },
-    }, firstLabelLayer(map));
-  }
-  if (!map.getLayer('parcel-selected-line')) {
-    map.addLayer({
-      id: 'parcel-selected-line',
-      type: 'line',
-      source: SELECTED_SOURCE,
-      paint: { 'line-color': '#3F6212', 'line-width': 2.4 },
-    }, firstLabelLayer(map));
-  }
-}
 
 export const LAYER_GROUPS = [...new Set(LAYERS.map((l) => l.group))];
 export const findLayer = (id) => LAYERS.find((l) => l.id === id);

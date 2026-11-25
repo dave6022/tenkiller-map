@@ -4,7 +4,6 @@ import MapView from './map/MapView.jsx';
 import LayerPanel from './components/LayerPanel.jsx';
 import PointCard from './components/PointCard.jsx';
 import { LAYERS } from './map/layers.js';
-import { lookupParcel } from './lib/parcel.js';
 import { fetchLakeLevel } from './lib/lakeLevel.js';
 import { NORMAL_POOL_FT } from './config.js';
 
@@ -37,7 +36,6 @@ export default function App() {
   const [ui, setUi] = useState(() => ({ ...DEFAULTS, ...loadStored() }));
   const [panel, setPanel] = useState(false);
   const [point, setPoint] = useState(null);
-  const [parcel, setParcel] = useState({ status: 'idle', data: null });
   const [lake, setLake] = useState(null);
 
   // Current pool elevation, fetched once per session.
@@ -48,27 +46,6 @@ export default function App() {
       .catch(() => { /* the plate falls back to normal pool */ });
     return () => ac.abort();
   }, []);
-
-  const parcelsOn = ui.enabled.includes('parcels');
-
-  // Look the parcel up whenever a new coordinate is tapped, but only while the
-  // layer is on — otherwise every tap would hit the state's server for data
-  // nobody asked to see.
-  useEffect(() => {
-    if (!point || !parcelsOn) { setParcel({ status: 'idle', data: null }); return undefined; }
-
-    const ac = new AbortController();
-    setParcel({ status: 'loading', data: null });
-
-    lookupParcel(point.lng, point.lat, { signal: ac.signal })
-      .then((data) => setParcel({ status: data ? 'ok' : 'empty', data }))
-      .catch((err) => {
-        if (err.name === 'AbortError') return;
-        setParcel({ status: 'error', data: null, error: err.message });
-      });
-
-    return () => ac.abort();
-  }, [point, parcelsOn]);
 
   useEffect(() => {
     try {
@@ -102,7 +79,6 @@ export default function App() {
         enabled={ui.enabled}
         exaggeration={ui.exaggeration}
         point={point}
-        parcelGeometry={parcel.data ? parcel.data.geometry : null}
         onReadout={setPoint}
       />
 
@@ -166,8 +142,6 @@ export default function App() {
 
       <PointCard
         point={point}
-        parcel={parcel}
-        parcelsOn={parcelsOn}
         lake={lake}
         onClose={() => setPoint(null)}
       />

@@ -1,9 +1,9 @@
 {
-  "name": "tenkiller-live",
+  "name": "tenkiller-map",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Real-time tracking of homes and land around Lake Tenkiller.",
+  "description": "Interactive terrain and recreation map of Lake Tenkiller, Oklahoma.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

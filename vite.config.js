@@ -11,27 +11,6 @@ function apiProxy() {
   return {
     name: 'api-proxy',
     configureServer(server) {
-      server.middlewares.use('/api/parcel', async (req, res) => {
-        const { fetchParcel } = await import('./shared/parcel.mjs');
-        const { searchParams } = new URL(req.url, 'http://localhost');
-        const lat = Number(searchParams.get('lat'));
-        const lng = Number(searchParams.get('lng'));
-        res.setHeader('content-type', 'application/json');
-
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-          res.statusCode = 400;
-          res.end(JSON.stringify({ error: 'lat and lng are required' }));
-          return;
-        }
-
-        try {
-          res.end(JSON.stringify({ parcel: await fetchParcel(lng, lat) }));
-        } catch (err) {
-          res.statusCode = 502;
-          res.end(JSON.stringify({ error: err.message }));
-        }
-      });
-
       server.middlewares.use('/api/lake-level', async (req, res) => {
         const { fetchLakeLevel } = await import('./shared/usace.mjs');
         res.setHeader('content-type', 'application/json');

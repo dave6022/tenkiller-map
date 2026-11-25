@@ -1,7 +1,7 @@
 {
-  "name": "Tenkiller Live",
+  "name": "Tenkiller Map",
   "short_name": "Tenkiller",
-  "description": "Real-time tracking of homes and land around Lake Tenkiller.",
+  "description": "Interactive terrain and recreation map of Lake Tenkiller, Oklahoma.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
