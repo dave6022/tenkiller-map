@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { NORMAL_POOL_FT } from '../config.js';
 import { copy, metresToFeet, toDD, toDDM, toDMS } from '../lib/coords.js';
-import { parcelRows, parcelUpdated } from '../lib/parcel.js';
 
 const row = { display: 'flex', justifyContent: 'space-between', gap: 12, padding: '9px 0' };
 const key = { font: '400 11.5px/1.3 Geist,system-ui', color: '#7C8272' };
 const val = { font: "500 12.5px/1.3 'JetBrains Mono',monospace", color: '#14170F', textAlign: 'right' };
 
-export default function PointCard({ point, parcel, parcelsOn, lake, onClose }) {
+export default function PointCard({ point, lake, onClose }) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => { setCopied(false); }, [point]);
@@ -158,66 +157,6 @@ export default function PointCard({ point, parcel, parcelsOn, lake, onClose }) {
             >
               {point.site.reservable ? 'Reserve on Recreation.gov ↗' : 'View on Recreation.gov ↗'}
             </a>
-          )}
-        </div>
-      )}
-
-      {parcelsOn && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(20,23,15,.12)' }}>
-          <div style={{ font: "600 10px/1 'JetBrains Mono',monospace", letterSpacing: '1.1px', color: '#7C8272', textTransform: 'uppercase' }}>
-            Parcel
-          </div>
-
-          {parcel.status === 'loading' && (
-            <div style={{ marginTop: 8, font: '400 11.5px/1.4 Geist,system-ui', color: '#7C8272' }}>
-              Looking up the assessor record…
-            </div>
-          )}
-
-          {parcel.status === 'empty' && (
-            <div style={{ marginTop: 8, font: '400 11.5px/1.4 Geist,system-ui', color: '#7C8272' }}>
-              No parcel here. Open water and Corps shoreline are often outside the tax roll.
-            </div>
-          )}
-
-          {parcel.status === 'error' && (
-            <div style={{ marginTop: 8, font: '400 11.5px/1.4 Geist,system-ui', color: '#7C6A52' }}>
-              Lookup failed — {parcel.error}
-            </div>
-          )}
-
-          {parcel.status === 'ok' && (
-            <>
-              <div style={{ marginTop: 6 }}>
-                {parcelRows(parcel.data).map(([k, v], i, arr) => (
-                  <div key={k} style={{ ...row, borderBottom: i < arr.length - 1 ? '1px solid rgba(20,23,15,.06)' : 'none' }}>
-                    <span style={key}>{k}</span>
-                    <span style={{ ...val, maxWidth: '62%', wordBreak: 'break-word' }}>{v}</span>
-                  </div>
-                ))}
-              </div>
-
-              {parcel.data.iproplogiclink && (
-                <a
-                  href={parcel.data.iproplogiclink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'block', marginTop: 8, height: 38, borderRadius: 10,
-                    border: '1px solid rgba(20,23,15,.12)', background: '#fff',
-                    font: '500 12.5px/38px Geist,system-ui', color: '#14170F',
-                    textAlign: 'center', textDecoration: 'none',
-                  }}
-                >Open county record ↗</a>
-              )}
-
-              {parcelUpdated(parcel.data) && (
-                <div style={{ marginTop: 8, font: '400 10.5px/1.4 Geist,system-ui', color: '#A5A99B' }}>
-                  County roll updated {parcelUpdated(parcel.data)}. Ownership changes reach the assessor
-                  before they reach this map.
-                </div>
-              )}
-            </>
           )}
         </div>
       )}

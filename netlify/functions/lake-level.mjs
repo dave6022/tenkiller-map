@@ -1,7 +1,7 @@
 import { fetchLakeLevel } from '../../shared/usace.mjs';
 
 // The Corps' gage page sends no CORS header, so the browser cannot read it
-// directly. Same pattern as the parcel proxy.
+// directly, so this function makes the request server-side.
 export default async () => {
   try {
     const level = await fetchLakeLevel();

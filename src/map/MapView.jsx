@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import { BASEMAPS, LAKE, MAPBOX_TOKEN } from '../config.js';
-import { LAYERS, REC_LAYER_IDS, findLayer, showSelectedParcel } from './layers.js';
+import { LAYERS, REC_LAYER_IDS, findLayer } from './layers.js';
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -16,7 +16,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
  * style reports ready. Layer attach() functions are written to tolerate that.
  */
 export default function MapView({
-  basemap, enabled, exaggeration, point, parcelGeometry, onReady, onReadout,
+  basemap, enabled, exaggeration, point, onReady, onReadout,
 }) {
   const hostRef = useRef(null);
   const mapRef = useRef(null);
@@ -186,17 +186,6 @@ export default function MapView({
       markerRef.current.setLngLat([point.lng, point.lat]);
     }
   }, [point]);
-
-  // Outline of the tapped parcel.
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    try {
-      showSelectedParcel(map, parcelGeometry);
-    } catch (err) {
-      console.error('parcel highlight failed', err);
-    }
-  }, [parcelGeometry]);
 
   // Basemap switch.
   useEffect(() => {
